@@ -1,1 +1,5 @@
-export class CreateMessageDto {}
+export class CreateMessageDto {
+  id?: number;
+  username?: string;
+  message: string;
+}

@@ -1,15 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
+import { Message } from './entities/message.entity';
 
 @Injectable()
 export class MessagesService {
+  messages: Message[] = [];
+
   create(createMessageDto: CreateMessageDto) {
-    return 'This action adds a new message';
+    const message: Message = createMessageDto;
+    console.log(message);
+    this.messages.push(message);
+    return message;
   }
 
   findAll() {
-    return `This action returns all messages`;
+    return this.messages;
   }
 
   findOne(id: number) {
