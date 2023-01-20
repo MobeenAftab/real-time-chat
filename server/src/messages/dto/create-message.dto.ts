@@ -1,5 +1,5 @@
 export class CreateMessageDto {
-  id?: number;
-  username?: string;
+  id: number;
+  username: string;
   message: string;
 }

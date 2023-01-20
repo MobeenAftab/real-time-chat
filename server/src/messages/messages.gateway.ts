@@ -62,4 +62,25 @@ export class MessagesGateway {
   handleConnection() {
     this.server.emit('connection', 'client connected');
   }
+
+  /**
+   * TODO: update the
+   */
+  @SubscribeMessage('joinRoom')
+  joinRoom(
+    @MessageBody('name') name: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    console.log(name);
+    return this.messagesService.addClientToRoom(client.id, client.id);
+  }
+
+  @SubscribeMessage('typing')
+  async isTyping(
+    @MessageBody('isTyping') isTyping: boolean,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const name = await this.messagesService.getClientById(client.id);
+    client.broadcast.emit('typing', name);
+  }
 }

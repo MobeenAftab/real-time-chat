@@ -59,21 +59,29 @@
   <body>
     <ul id="messages"></ul>
     <form id="form" action="">
+      <input id="nameInput" autocomplete="off" />
       <input id="input" autocomplete="off" /><button>Send</button>
     </form>
+    <p id="usersTyping"></p>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script>
       const socket = io();
 
       const form = document.getElementById('form');
       const input = document.getElementById('input');
+      const nameInput = document.getElementById('nameInput');
       const messages = document.getElementById('messages');
+      // Turn this into an array to handle multiple users typing simultaneously
+      const usersTyping = document.getElementById('usersTyping');
+
+      const oldName = nameInput.value;
 
       input.addEventListener('input', (e) => {
         socket.emit('typing', e);
       });
 
       form.addEventListener('submit', function (e) {
+        // checkIfUsernameChanged();
         e.preventDefault();
         if (input.value) {
           socket.emit('createMessage', { message: input.value });
@@ -98,17 +106,33 @@
         window.scrollTo(0, document.body.scrollHeight);
       });
 
+      // TODO: need to remove is typing after message
+      // has been received
       socket.on('typing', function (name) {
         console.log(name);
+        // usersTyping.innerText = `${name} is typing...`;
       });
 
       socket.on('connection', (data) => {
         console.log('server connected');
         socket.emit('findAllMessages');
+        socket.emit('joinRoom');
+        // checkIfUsernameChanged();
+        // socket.emit('joinRoom', { name: getUsername() });
       });
 
       function chatMessageFormatter(msg) {
         return `${msg.username}: ${msg.message}`;
+      }
+
+      function getUsername() {
+        return usersTyping.value ? usersTyping.value : '';
+      }
+
+      function checkIfUsernameChanged() {
+        if (nameInput.value != oldName) {
+          socket.emit('joinRoom', { name: getUsername() });
+        }
       }
     </script>
   </body>
