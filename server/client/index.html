@@ -69,34 +69,47 @@
       const input = document.getElementById('input');
       const messages = document.getElementById('messages');
 
+      input.addEventListener('input', (e) => {
+        socket.emit('typing', e);
+      });
+
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         if (input.value) {
-          socket.emit('createMessage', input.value);
+          socket.emit('createMessage', { message: input.value });
           input.value = '';
         }
       });
 
       socket.on('createMessage', function (msg) {
         const item = document.createElement('li');
-        item.textContent = msg;
+        item.textContent = chatMessageFormatter(msg);
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
       });
 
       socket.on('findAllMessages', function (msg) {
+        messages.innerHTML = '';
         msg.forEach((element) => {
           let item = document.createElement('li');
-          item.textContent = element;
+          item.textContent = chatMessageFormatter(element);
           messages.appendChild(item);
         });
         window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      socket.on('typing', function (name) {
+        console.log(name);
       });
 
       socket.on('connection', (data) => {
         console.log('server connected');
         socket.emit('findAllMessages');
       });
+
+      function chatMessageFormatter(msg) {
+        return `${msg.username}: ${msg.message}`;
+      }
     </script>
   </body>
 </html>
